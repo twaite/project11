@@ -66,9 +66,7 @@ class CompilationEngine:
 			else:
 				break;
 
-		# print("after check")
-
-		print self.token
+		# print("after check"
 
 		#close bracket
 		self._write_token()
@@ -127,8 +125,9 @@ class CompilationEngine:
 
 		#compile the var declarations
 		self.advance()
-		if (self.token == "var"):
+		while (self.token == "var"):
 			self.compile_var_dec()
+			self.advance()
 
 		#compile the statements
 		self.compile_statements()
@@ -160,25 +159,11 @@ class CompilationEngine:
 
 		# print self.token
 
-		while (self.token == "var"):
-
-			#write var
+		while (self.token != ";"):
 			self._write_token()
-
-			#write type
 			self.advance()
-			self._write_token()
 
-			#write name
-			self.advance()
-			self._write_token()
-
-			#write semicolon
-			self.advance()
-			self._write_token()
-
-			#read next entry to see if it's a var
-			self.advance()
+		self._write_token()
 
 		self._tab_dec()
 		self._write_close_tag("varDec")
@@ -202,6 +187,9 @@ class CompilationEngine:
 			if (self.token == "if"):
 				self.compile_if()
 
+			if (self.token == "while"):
+				self.compile_while()
+
 			self.advance()
 
 		if (self.token == "return"):
@@ -209,6 +197,32 @@ class CompilationEngine:
 
 		self._tab_dec()
 		self._write_close_tag("statements")
+
+	def compile_while(self):
+
+		self._write_open_tag("whileStatement")
+		self._tab_inc()
+
+		while (self.token != ";"):
+			self._write_token()
+			self.advance()
+
+			if (self.token == "("):
+				self._write_token()
+				self.advance()
+				self.compile_expression()
+
+			if (self.token == "{"):
+				self._write_token()
+				self.advance()
+				self.compile_statements()
+
+			if (self.token == "}"):
+				self._write_token()
+				break;
+
+		self._tab_dec()
+		self._write_close_tag("whileStatement")
 
 	def compile_if(self):
 
@@ -264,6 +278,11 @@ class CompilationEngine:
 			self._write_token()
 			self.advance()
 
+			if (self.token == "["):
+				self._write_token()
+				self.advance()
+				self.compile_expression()
+
 			if (self.token == "="):
 				self._write_token()
 				self.advance()
@@ -279,7 +298,28 @@ class CompilationEngine:
 		self._write_open_tag("expression")
 		self._tab_inc()
 
-		self.compile_term()
+		#print (self.token)
+		while (True):
+			if (self.token == ";"):
+				break;
+			elif (self.token == ","):
+				break;
+			elif (self.token == ")"):
+				break;
+			elif (self.token == "]"):
+				break;
+			elif (self.token == "+" 
+					or self.token == "-"
+					or self.token == "&gt;"
+					or self.token == "&lt;"
+					or self.token == "&amp;"
+					or self.token == "="):
+				self._write_token()
+				self.advance()
+			else:
+				self.compile_term()
+
+		#print (self.token)
 
 		self._tab_dec()
 		self._write_close_tag("expression")
@@ -289,8 +329,37 @@ class CompilationEngine:
 		self._write_open_tag("term")
 		self._tab_inc()
 
-		self._write_token()
-		self.advance()
+		if (self.token != "("
+				and self.token != "~"
+				and self.token != "["):
+			self._write_token()
+			self.advance()
+
+		if (self.token == "."):
+			while (self.token != ";"):
+				self._write_token()
+				self.advance()
+
+				if (self.token == "("):
+					self._write_token()
+					self.advance()
+					self.compile_expression_list()
+
+				if (self.token == "+"):
+					return None
+
+		if (self.token == "("
+			or self.token == "["):
+			self._write_token()
+			self.advance()
+			self.compile_expression()
+			self._write_token()
+			self.advance()
+
+		if (self.token == "~"):
+			self._write_token()
+			self.advance()
+			self.compile_term()
 
 		self._tab_dec()
 		self._write_close_tag("term")

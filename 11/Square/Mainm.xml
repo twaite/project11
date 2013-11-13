@@ -26,12 +26,14 @@
           <expression>
             <term>
               <identifier> SquareGame </identifier>
+              <symbol> . </symbol>
+              <identifier> new </identifier>
+              <symbol> ( </symbol>
+              <expressionList>
+              </expressionList>
+              <symbol> ) </symbol>
             </term>
           </expression>
-          <symbol> . </symbol>
-          <identifier> new </identifier>
-          <symbol> ( </symbol>
-          <symbol> ) </symbol>
           <symbol> ; </symbol>
         </letStatement>
         <doStatement>
@@ -40,11 +42,9 @@
           <symbol> . </symbol>
           <identifier> run </identifier>
           <symbol> ( </symbol>
-          <expression>
-            <term>
-              <symbol> ) </symbol>
-            </term>
-          </expression>
+          <expressionList>
+          </expressionList>
+          <symbol> ) </symbol>
           <symbol> ; </symbol>
         </doStatement>
         <doStatement>
@@ -53,11 +53,9 @@
           <symbol> . </symbol>
           <identifier> dispose </identifier>
           <symbol> ( </symbol>
-          <expression>
-            <term>
-              <symbol> ) </symbol>
-            </term>
-          </expression>
+          <expressionList>
+          </expressionList>
+          <symbol> ) </symbol>
           <symbol> ; </symbol>
         </doStatement>
         <returnStatement>
@@ -69,4 +67,4 @@
     </subroutineBody>
   </subroutineDec>
   <symbol> } </symbol>
-  </class>
+</class>
