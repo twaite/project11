@@ -1,4 +1,5 @@
 import re
+import SymbolTable
 
 class CompilationEngine:
 
@@ -313,7 +314,9 @@ class CompilationEngine:
 					or self.token == "&gt;"
 					or self.token == "&lt;"
 					or self.token == "&amp;"
-					or self.token == "="):
+					or self.token == "="
+					or self.token == "\\/"
+					or self.token == "*"):
 				self._write_token()
 				self.advance()
 			else:

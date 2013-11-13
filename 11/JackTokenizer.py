@@ -154,6 +154,7 @@ class JackTokenizer:
 		elif (tok == "print"):
 			self.advance()
 			tok = "print" + self.token
+			tok_type = "identifier"
 
 		self.ofile.write("<%s> %s </%s>\n" %(tok_type, tok, tok_type))
 
