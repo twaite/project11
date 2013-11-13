@@ -52,20 +52,43 @@ class CompilationEngine:
 		# print("before check")
 
 		#write subroutine or class vars
-		while (self.token != '}'):
+		while ( True ):
 			self.advance()
 
-			if (self.token == "function"):
+			if (self.token == "function" 
+				or self.token == "constructor"
+				or self.token == "method"):
 				self.compile_subroutine()
+
+			elif (self.token == "field"):
+				self.compile_class_var_dec()
+
+			else:
+				break;
 
 		# print("after check")
 
+		print self.token
+
 		#close bracket
-		self.advance()
 		self._write_token()
 
 		self._tab_dec()
 		self._write_close_tag("class")
+
+	def compile_class_var_dec(self):
+
+		self._write_open_tag("classVarDec")
+		self._tab_inc()
+
+		while (self.token != ';'):
+			self._write_token()
+			self.advance()
+
+		self._write_token()
+
+		self._tab_dec()
+		self._write_close_tag("classVarDec")
 
 	def compile_subroutine(self):
 
@@ -104,7 +127,8 @@ class CompilationEngine:
 
 		#compile the var declarations
 		self.advance()
-		self.compile_var_dec()
+		if (self.token == "var"):
+			self.compile_var_dec()
 
 		#compile the statements
 		self.compile_statements()
@@ -121,6 +145,13 @@ class CompilationEngine:
 
 	def compile_parameter_list(self):
 		self._write_open_tag("parameterList")
+		self._tab_inc()
+
+		while (self.token != ")"):
+			self._write_token()
+			self.advance()
+
+		self._tab_dec()
 		self._write_close_tag("parameterList")
 
 	def compile_var_dec(self):
@@ -159,18 +190,51 @@ class CompilationEngine:
 
 		while (self.token != "return"):
 
+			if (self.token == "}"):
+				break;
+
 			if (self.token == "do"):
 				self.compile_do()
 
 			if (self.token == "let"):
 				self.compile_let()
 
+			if (self.token == "if"):
+				self.compile_if()
+
 			self.advance()
 
-		self.compile_return()
+		if (self.token == "return"):
+			self.compile_return()
 
 		self._tab_dec()
 		self._write_close_tag("statements")
+
+	def compile_if(self):
+
+		self._write_open_tag("ifStatement")
+		self._tab_inc()
+
+		while (self.token != ";"):
+			self._write_token()
+			self.advance()
+
+			if (self.token == "("):
+				self._write_token()
+				self.advance()
+				self.compile_expression()
+
+			if (self.token == "{"):
+				self._write_token()
+				self.advance()
+				self.compile_statements()
+
+			if (self.token == "}"):
+				self._write_token()
+				break;
+
+		self._tab_dec()
+		self._write_close_tag("ifStatement")
 
 	def compile_do(self):
 
@@ -238,9 +302,11 @@ class CompilationEngine:
 
 		#write return
 		self._write_token()
-
-		#write semilcolon
 		self.advance()
+
+		if (self.token != ';'):
+			self.compile_expression()
+
 		self._write_token()
 
 		self._tab_dec()
@@ -249,6 +315,16 @@ class CompilationEngine:
 	def compile_expression_list(self):
 
 		self._write_open_tag("expressionList")
+		self._tab_inc()
+
+		while (self.token != ")"):
+			if (self.token == ","):
+				self._write_token()
+				self.advance()
+			else:
+				self.compile_expression()
+
+		self._tab_dec()
 		self._write_close_tag("expressionList")
 
 	def _write_tabs(self):
